@@ -41,13 +41,18 @@ class Converter:
                 question_content = transformer.handle(question["Text"]).strip() + "\n"
                 answers = question["AnswerTemplates"]
                 index_of_correct_answer = 0
-                for index, answer in enumerate(answers):
-                    answer_option = transformer.handle(
-                        f"{settings.QUESTION_ANSWER_HEADING[index][1]} {answer["TextWOHtml"]}",
-                    ).strip()
-                    question_content += answer_option + "\n"
-                    if answer.get("Score") == 1.0:
-                        index_of_correct_answer = index
+                try:
+                    for index, answer in enumerate(answers):
+                        answer_option = transformer.handle(
+                            f"{settings.QUESTION_ANSWER_HEADING[index][1]} {answer['TextWOHtml']}",
+                        ).strip()
+                        question_content += answer_option + "\n"
+                        if answer.get("Score") == 1.0:
+                            index_of_correct_answer = index
+                except IndexError:
+                    logging.warning(
+                        f"Question has more than {len(settings.QUESTION_ANSWER_HEADING)} answers. Skipping extra answers.",
+                    )
                 correct_answer = f"ANSWER: {settings.QUESTION_ANSWER_HEADING[index_of_correct_answer][0]}"
                 question_content += correct_answer + "\n"
                 self._create_aiken_file(question_content)

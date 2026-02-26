@@ -1,3 +1,6 @@
+import sys
+import traceback
+
 import wx
 
 
@@ -44,7 +47,9 @@ class ConverterApp(wx.Frame):
     def on_convert(self, event):  # noqa
         if not self.file_path:
             wx.MessageBox("Please select a file first!", "Error", wx.OK | wx.ICON_ERROR)
+            print("Error: file not selected", file=sys.stderr)
             return
+
         try:
             from converter import Converter
 
@@ -54,7 +59,11 @@ class ConverterApp(wx.Frame):
                 "Success",
                 wx.OK | wx.ICON_INFORMATION,
             )
+            print(f"Conversion successful. Added {count_questions} questions.")
+
         except Exception as e:
+            print("Exception occurred:", file=sys.stderr)
+            traceback.print_exc()
             wx.MessageBox(f"An error occurred: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
 
